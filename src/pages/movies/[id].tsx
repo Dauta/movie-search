@@ -1,26 +1,21 @@
 import Head from "next/head";
 import { MovieDetailPage } from "@/components/MovieDetailPage";
 
-import type { InferGetServerSidePropsType, GetServerSideProps, PageConfig } from "next";
-import { TMDBDetailsResponse } from "@/types/TMDBResponses";
-
-export const config: PageConfig = {
-  runtime: "experimental-edge",
-};
+import type { InferGetServerSidePropsType, GetServerSideProps } from "next";
+import { TMDBResponse } from "@/types/TMDBResponses";
+import { MovieService } from "@/services/MovieService";
+import Movie from "@/db/models/Movie";
 
 export default function Home({
   movieDetails,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const {title, tagline} = movieDetails;
+  const { title } = movieDetails;
 
   return (
     <>
       <Head>
         <title>{title}</title>
-        <meta
-          name="description"
-          content={tagline}
-        />
+        <meta name="description" content={`${title} - detail page`} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
@@ -32,31 +27,13 @@ export default function Home({
 }
 
 export const getServerSideProps: GetServerSideProps<{
-  movieDetails: TMDBDetailsResponse;
+  movieDetails: TMDBResponse;
 }> = async (req) => {
-  const movieId = req.params?.id;
+  if (!req.params?.id) throw new Error("movie id is required");
 
-  if (!movieId) throw new Error("movie id is required");
-
-  const authHeader = `Bearer ${process.env.API_TOKEN}`;
-  const baseUrl = `https://api.themoviedb.org/3/movie/${movieId}`;
-
-  const requestUrl = new URL(baseUrl);
-
-  requestUrl.searchParams.set("language", "en");
-
-  const options = {
-    method: "GET",
-    headers: { accept: "application/json", Authorization: authHeader },
-  };
-
-  const result = await fetch(requestUrl, options);
-
-  if (!result.ok) {
-    throw new Error(result.statusText);
-  }
-
-  const movieDetails = (await result.json()) as TMDBDetailsResponse;
+  const movieId = Number(req.params?.id);
+  const movieService = new MovieService(Movie);
+  const movieDetails = await movieService.getMovieById(movieId);
 
   return { props: { movieDetails } };
 };

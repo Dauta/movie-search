@@ -1,10 +1,5 @@
 import Head from "next/head";
 import { SearchPage } from "@/components/SearchPage";
-import { PageConfig } from "next";
-
-export const config: PageConfig = {
-  runtime: "experimental-edge",
-};
 
 export default function Home() {
   return (

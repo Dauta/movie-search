@@ -1,0 +1,13 @@
+{
+  "development": {
+    "database": "movies",
+    "dialect": "sqlite",
+    "storage": "./db/movies.db" 
+
+  },
+  "production": {
+    "database": "movies",
+    "dialect": "sqlite",
+    "storage": "./db/movies.db"
+  }
+}

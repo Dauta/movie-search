@@ -1,10 +1,11 @@
+import Movie from "@/db/models/Movie";
 import { normalizeString } from "@/helpers/normalizeString";
-import { TMDBSearchResponse } from "@/types/TMDBResponses";
+import { MovieService } from "@/services/MovieService";
+import { PaginatedApiResponse } from "@/types/PaginatedResponse";
+import { TMDBResponse } from "@/types/TMDBResponses";
 import type { NextApiRequest, NextApiResponse } from "next";
 
-type Data = {
-  movies: TMDBSearchResponse[];
-};
+type Data = PaginatedApiResponse<TMDBResponse>;
 
 export default async function handler(
   req: NextApiRequest,
@@ -15,27 +16,8 @@ export default async function handler(
   // TODO handle non integer inputs
   const page = normalizeString(req.query.page);
 
-  const authHeader = `Bearer ${process.env.API_TOKEN}`;
-  const baseUrl = "https://api.themoviedb.org/3/search/movie";
+  const movieService = new MovieService(Movie);
 
-  const requestUrl = new URL(baseUrl);
-
-  requestUrl.searchParams.set("include_adult", "false");
-  requestUrl.searchParams.set("query", queryString);
-  requestUrl.searchParams.set("page", page);
-
-  const options = {
-    method: "GET",
-    headers: { accept: "application/json", Authorization: authHeader },
-  };
-
-  const result = await fetch(requestUrl, options);
-
-  if (!result.ok) {
-    console.error(result.statusText);
-  }
-
-  const movies = await result.json();
-
+  const movies = await movieService.search(queryString, page);
   res.status(200).json(movies);
 }

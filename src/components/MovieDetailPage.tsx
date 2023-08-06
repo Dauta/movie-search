@@ -1,10 +1,10 @@
-import { TMDBDetailsResponse } from "@/types/TMDBResponses";
+import { TMDBResponse } from "@/types/TMDBResponses";
 import styled from "styled-components";
 import ResponsiveFlexContainer from "./ResponsiveFlexContainer";
 import { PlaceholderPoster } from "./PosterPlaceholder";
 import Link from "next/link";
 
-type MovieDetailsPageProps = { movie: TMDBDetailsResponse };
+type MovieDetailsPageProps = { movie: TMDBResponse };
 type BackdropContainerProps = {
   url: string;
 };
@@ -79,7 +79,7 @@ const BackLink = styled(Link)`
   position: absolute;
   top: 24px;
   left: 24px;
-`
+`;
 
 export const MovieDetailPage = ({ movie }: MovieDetailsPageProps) => {
   const backdropUrl = `${backdropBaseUrl}${movie.backdrop_path}`;
@@ -104,12 +104,10 @@ export const MovieDetailPage = ({ movie }: MovieDetailsPageProps) => {
           </ImageContainer>
           <DetailsContainer>
             <Title>{movie.title}</Title>
-            <SubTitle>{movie.tagline}</SubTitle>
-
-            <ParagraphItalic>{movie.genres.map(genre => genre.name).join(', ')}</ParagraphItalic>
-            <ParagraphItalic>Rating: {roundedScore}/10</ParagraphItalic>
-            <ParagraphItalic>{new Date(movie.release_date).getFullYear()}</ParagraphItalic>
-
+            <SubTitle>Rating: {roundedScore}/10</SubTitle>
+            <ParagraphItalic>
+              {new Date(movie.release_date).getFullYear()}
+            </ParagraphItalic>
             <Paragraph>{movie.overview}</Paragraph>
           </DetailsContainer>
         </ResponsiveFlexContainer>
