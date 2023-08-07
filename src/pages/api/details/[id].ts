@@ -11,7 +11,9 @@ export default async function handler(
   res: NextApiResponse<Data>
 ) {
   const movieId = Number(normalizeString(req.query.id));
-  const movieService = new MovieService(Movie);
+  const movieService = new MovieService();
+  await movieService.initDb();
+
   const movieDetails = await movieService.getMovieById(movieId);
 
   res.status(200).json(movieDetails);

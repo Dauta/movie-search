@@ -32,7 +32,9 @@ export const getServerSideProps: GetServerSideProps<{
   if (!req.params?.id) throw new Error("movie id is required");
 
   const movieId = Number(req.params?.id);
-  const movieService = new MovieService(Movie);
+  const movieService = new MovieService();
+  await movieService.initDb();
+
   const movieDetails = await movieService.getMovieById(movieId);
 
   return { props: { movieDetails } };

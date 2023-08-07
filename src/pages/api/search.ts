@@ -16,7 +16,8 @@ export default async function handler(
   // TODO handle non integer inputs
   const page = normalizeString(req.query.page);
 
-  const movieService = new MovieService(Movie);
+  const movieService = new MovieService();
+  await movieService.initDb();
 
   const movies = await movieService.search(queryString, page);
   res.status(200).json(movies);

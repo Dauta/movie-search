@@ -1,5 +1,7 @@
+import { getDbInstance } from "@/db";
 import Movie from "@/db/models/Movie";
 import { TMDBResponse } from "@/types/TMDBResponses";
+import { Sequelize } from "sequelize";
 
 const API_TOKEN = process.env.API_TOKEN;
 const baseUrl = "https://api.themoviedb.org/3";
@@ -16,10 +18,10 @@ type PaginatedApiResponse<Item> = {
 };
 
 export class MovieService {
-  movieModel: typeof Movie;
+  db: Sequelize | null = null;
 
-  constructor(model: typeof Movie) {
-    this.movieModel = model;
+  async initDb() {
+    this.db = await getDbInstance();
   }
 
   private fetchWithToken = async <T>(
@@ -52,9 +54,11 @@ export class MovieService {
   };
 
   private async cache(movieSearchResult: TMDBResponse[]) {
+    if (!this.db) throw new Error("no db instance");
+
     const cachedItems = [];
     for (const movie of movieSearchResult) {
-      const [cachedMovie, created] = await this.movieModel.findOrCreate({
+      const [cachedMovie, created] = await this.db.models.Movie.findOrCreate({
         where: {
           id: movie.id,
         },
@@ -66,19 +70,23 @@ export class MovieService {
       }`;
       console.log(cacheLog);
 
-      cachedItems.push(cachedMovie);
+      cachedItems.push(cachedMovie as Movie);
     }
 
     return cachedItems;
   }
 
   private async findInCache(id: Movie["id"]) {
+    if (!this.db) throw new Error("no db instance");
+
     try {
-      return this.movieModel.findOne({
+      const cachedMovie = await this.db.models.Movie.findOne({
         where: {
           id,
         },
       });
+
+      return cachedMovie as Movie;
     } catch (err) {
       console.log(err);
       return null;
