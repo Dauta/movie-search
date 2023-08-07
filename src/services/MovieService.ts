@@ -56,24 +56,28 @@ export class MovieService {
   private async cache(movieSearchResult: TMDBResponse[]) {
     if (!this.db) throw new Error("no db instance");
 
-    const cachedItems = [];
-    for (const movie of movieSearchResult) {
-      const [cachedMovie, created] = await this.db.models.Movie.findOrCreate({
-        where: {
-          id: movie.id,
-        },
-        defaults: movie,
-      });
+    try {
+      const cachedItems = [];
+      for (const movie of movieSearchResult) {
+        const [cachedMovie, created] = await this.db.models.Movie.findOrCreate({
+          where: {
+            id: movie.id,
+          },
+          defaults: movie,
+        });
 
-      const cacheLog = `${movie.id} ------- CACHE ${
-        created ? "MISS ❌" : "HIT ✅"
-      }`;
-      console.log(cacheLog);
-
-      cachedItems.push(cachedMovie as Movie);
+        const cacheLog = `${movie.id} ------- CACHE ${
+          created ? "MISS ❌" : "HIT ✅"
+        }`;
+        console.log(cacheLog);
+        cachedItems.push(cachedMovie as Movie);
+      }
+      return cachedItems;
+    } catch (err) {
+      console.log("COULD NOT READ CACHE ❌❌");
     }
 
-    return cachedItems;
+    return movieSearchResult;
   }
 
   private async findInCache(id: Movie["id"]) {
