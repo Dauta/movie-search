@@ -4,7 +4,6 @@ import { MovieDetailPage } from "@/components/MovieDetailPage";
 import type { InferGetServerSidePropsType, GetServerSideProps } from "next";
 import { TMDBResponse } from "@/types/TMDBResponses";
 import { MovieService } from "@/services/MovieService";
-import Movie from "@/db/models/Movie";
 
 export default function Home({
   movieDetails,
@@ -33,7 +32,7 @@ export const getServerSideProps: GetServerSideProps<{
 
   const movieId = Number(req.params?.id);
   const movieService = new MovieService();
-  await movieService.initDb();
+  // await movieService.initDb();
 
   const movieDetails = await movieService.getMovieById(movieId);
 

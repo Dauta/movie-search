@@ -1,4 +1,3 @@
-import Movie from "@/db/models/Movie";
 import { normalizeString } from "@/helpers/normalizeString";
 import { MovieService } from "@/services/MovieService";
 import { PaginatedApiResponse } from "@/types/PaginatedResponse";
@@ -17,7 +16,7 @@ export default async function handler(
   const page = normalizeString(req.query.page);
 
   const movieService = new MovieService();
-  await movieService.initDb();
+  // await movieService.initDb();
 
   const movies = await movieService.search(queryString, page);
   res.status(200).json(movies);

@@ -1,7 +1,7 @@
-import { getDbInstance } from "@/db";
-import Movie from "@/db/models/Movie";
+// import { getDbInstance } from "@/db";
+// import Movie from "@/db/models/Movie";
 import { TMDBResponse } from "@/types/TMDBResponses";
-import { Sequelize } from "sequelize";
+// import { Sequelize } from "sequelize";
 
 const API_TOKEN = process.env.API_TOKEN;
 const baseUrl = "https://api.themoviedb.org/3";
@@ -18,11 +18,11 @@ type PaginatedApiResponse<Item> = {
 };
 
 export class MovieService {
-  db: Sequelize | null = null;
+  // db: Sequelize | null = null;
 
-  async initDb() {
-    this.db = await getDbInstance();
-  }
+  // async initDb() {
+  //   this.db = await getDbInstance();
+  // }
 
   private fetchWithToken = async <T>(
     endpoint: string,
@@ -53,49 +53,49 @@ export class MovieService {
     return response.json() as T;
   };
 
-  private async cache(movieSearchResult: TMDBResponse[]) {
-    if (!this.db) throw new Error("no db instance");
+  // private async cache(movieSearchResult: TMDBResponse[]) {
+  //   if (!this.db) throw new Error("no db instance");
 
-    try {
-      const cachedItems = [];
-      for (const movie of movieSearchResult) {
-        const [cachedMovie, created] = await this.db.models.Movie.findOrCreate({
-          where: {
-            id: movie.id,
-          },
-          defaults: movie,
-        });
+  //   try {
+  //     const cachedItems = [];
+  //     for (const movie of movieSearchResult) {
+  //       const [cachedMovie, created] = await this.db.models.Movie.findOrCreate({
+  //         where: {
+  //           id: movie.id,
+  //         },
+  //         defaults: movie,
+  //       });
 
-        const cacheLog = `${movie.id} ------- CACHE ${
-          created ? "MISS ❌" : "HIT ✅"
-        }`;
-        console.log(cacheLog);
-        cachedItems.push(cachedMovie as Movie);
-      }
-      return cachedItems;
-    } catch (err) {
-      console.log("COULD NOT READ CACHE ❌❌");
-    }
+  //       const cacheLog = `${movie.id} ------- CACHE ${
+  //         created ? "MISS ❌" : "HIT ✅"
+  //       }`;
+  //       console.log(cacheLog);
+  //       cachedItems.push(cachedMovie as Movie);
+  //     }
+  //     return cachedItems;
+  //   } catch (err) {
+  //     console.log("COULD NOT READ CACHE ❌❌");
+  //   }
 
-    return movieSearchResult;
-  }
+  //   return movieSearchResult;
+  // }
 
-  private async findInCache(id: Movie["id"]) {
-    if (!this.db) throw new Error("no db instance");
+  // private async findInCache(id: Movie["id"]) {
+  //   if (!this.db) throw new Error("no db instance");
 
-    try {
-      const cachedMovie = await this.db.models.Movie.findOne({
-        where: {
-          id,
-        },
-      });
+  //   try {
+  //     const cachedMovie = await this.db.models.Movie.findOne({
+  //       where: {
+  //         id,
+  //       },
+  //     });
 
-      return cachedMovie as Movie;
-    } catch (err) {
-      console.log(err);
-      return null;
-    }
-  }
+  //     return cachedMovie as Movie;
+  //   } catch (err) {
+  //     console.log(err);
+  //     return null;
+  //   }
+  // }
 
   async search(query: string, page: string) {
     const endpoint = "/search/movie";
@@ -105,18 +105,15 @@ export class MovieService {
       params: { query, page },
     });
 
-    const cachedResult = await this.cache(searchResult.results);
+    // const cachedResult = await this.cache(searchResult.results);
 
-    return {
-      ...searchResult,
-      results: cachedResult,
-    };
+    return searchResult;
   }
 
   async getMovieById(id: number) {
-    const cachedMovie = await this.findInCache(id);
+    // const cachedMovie = await this.findInCache(id);
 
-    if (cachedMovie) return cachedMovie;
+    // if (cachedMovie) return cachedMovie;
 
     const endpoint = `/movie/${id}`;
     return this.fetchWithToken<TMDBResponse>(endpoint);

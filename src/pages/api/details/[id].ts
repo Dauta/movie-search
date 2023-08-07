@@ -1,4 +1,3 @@
-import Movie from "@/db/models/Movie";
 import { normalizeString } from "@/helpers/normalizeString";
 import { MovieService } from "@/services/MovieService";
 import { TMDBResponse } from "@/types/TMDBResponses";
@@ -12,7 +11,7 @@ export default async function handler(
 ) {
   const movieId = Number(normalizeString(req.query.id));
   const movieService = new MovieService();
-  await movieService.initDb();
+  // await movieService.initDb();
 
   const movieDetails = await movieService.getMovieById(movieId);
 
